@@ -7,24 +7,19 @@
 
 #include <algorithm>
 #include <experimental/any>
+#include <experimental/type_traits>
 
 namespace hippobaro {
 
-    template<typename InnerIt>
+    template<typename InnerIt, typename Algo>
     class permutation_iterator : public InnerIt {
 
     public:
         using InnerIt::InnerIt;
 
-        std::shared_ptr<std::experimental::any> container;
+        std::shared_ptr<typename Algo::container> container;
 
-        template<typename Algo>
-        permutation_iterator(InnerIt iterator,
-                             std::shared_ptr<typename Algo::container> &container) noexcept :
-                InnerIt(iterator), container(container) {}
-
-        template<typename Algo>
-        permutation_iterator(InnerIt iterator,
+        explicit permutation_iterator(InnerIt iterator,
                              std::shared_ptr<typename Algo::container> container = nullptr) noexcept :
                 InnerIt(iterator), container(container) {}
 
@@ -32,8 +27,14 @@ namespace hippobaro {
 
     };
 
-    template<typename BidirIt, typename Algo>
-    bool next_permutation(permutation_iterator<BidirIt> &first, permutation_iterator<BidirIt> &last) {
+    template<typename Algo, typename InnerType>
+    static auto create_permutation_iterators(InnerType &set) noexcept {
+        return std::make_pair(permutation_iterator<decltype(set.begin()), Algo>(set.begin(), nullptr),
+                              permutation_iterator<decltype(set.end()), Algo>(set.end(), nullptr));
+    }
+
+    template<typename Algo, typename BidirIt>
+    bool next_permutation(permutation_iterator<BidirIt, Algo> &first, permutation_iterator<BidirIt, Algo> &last) {
         return Algo::next_permutation(first, last);
     }
 }

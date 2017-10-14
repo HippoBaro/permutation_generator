@@ -3,29 +3,29 @@
 #include "permutations.hpp"
 #include "algorithms/std_permutation.hpp"
 
-int main()
-{
-    std::string s = "aba";
-
-    auto its = hippobaro::std_permutation::create_permutation_iterator(s);
-    std::sort<decltype(s)::iterator>(its.first, its.second);
+template<typename Algo, typename Container>
+void output_all_permutation(Container& container) {
+    auto its = hippobaro::create_permutation_iterators<Algo>(container);
+    std::sort<typename Container::iterator>(its.first, its.second);
 
     do {
-        std::cout << s << std::endl;
-    } while(next_permutation(its.first, its.second));
+        for (auto &&item : container) {
+            std::cout << item;
+        }
+        std::cout << std::endl;
+
+    } while(hippobaro::next_permutation(its.first, its.second));
+}
+
+int main()
+{
+    //STRING
+    std::string s = "aba";
+    output_all_permutation<hippobaro::std_permutation>(s);
 
     //VECTOR
-
     std::cout << std::endl;
 
     std::vector<char> s2 = { 'a', 'b', 'a' };
-
-    auto its2 = hippobaro::std_permutation::create_permutation_iterator(s2);
-    std::sort<decltype(s2)::iterator>(its2.first, its2.second);
-
-    do {
-        for (auto &&item : s2)
-            std::cout << item;
-        std::cout << std::endl;
-    } while(next_permutation(its2.first, its2.second));
+    output_all_permutation<hippobaro::std_permutation>(s2);
 }
