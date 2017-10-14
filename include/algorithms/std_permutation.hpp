@@ -15,21 +15,21 @@ namespace hippobaro {
     public:
         using container = container;
 
-        template<typename InnerItType>
-        static auto create_permutation_iterator(InnerItType &set) {
-            std::sort(set.begin(), set.end());
-            return std::make_pair(permutation_iterator<InnerItType, std_permutation>(set.begin()), permutation_iterator<InnerItType, std_permutation>(set.end()));
+        template<typename InnerType>
+        static auto create_permutation_iterator(InnerType &set) noexcept {
+            return std::make_pair(permutation_iterator<decltype(set.begin())>(set.begin(), nullptr),
+                                  permutation_iterator<decltype(set.end())>(set.end(), nullptr));
         }
 
         template<typename BidirIt>
-        static bool next_permutation(hippobaro::permutation_iterator<BidirIt, std_permutation> &first, permutation_iterator<BidirIt, std_permutation> &last)
-        {
+        static bool next_permutation(permutation_iterator<BidirIt> &first,
+                                     permutation_iterator <BidirIt> &last) {
             if (first == last) return false;
             auto i = last;
             if (first == --i) return false;
 
             while (true) {
-                permutation_iterator<BidirIt, std_permutation> i1, i2;
+                permutation_iterator <BidirIt> i1, i2;
 
                 i1 = i;
                 if (*--i < *i1) {

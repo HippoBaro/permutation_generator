@@ -7,3 +7,6 @@ set(SOURCE_FILES main.cpp include/permutations.hpp include/algorithms/std_permut
 add_executable(permutation_generator ${SOURCE_FILES})
 
 target_include_directories(permutation_generator PUBLIC include)
+
+set(OPTS -O3 -Werror -Wall -Wextra)
+target_compile_options(permutation_generator PUBLIC ${OPTS})
