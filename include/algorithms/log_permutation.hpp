@@ -8,7 +8,7 @@
 #include "permutations.hpp"
 
 namespace hippobaro {
-    class std_permutation {
+    class log_permutation {
 
         struct container { };
 
@@ -21,13 +21,13 @@ namespace hippobaro {
         }
 
         template<typename BidirIt>
-        static bool next_permutation(permutation_iterator<BidirIt, std_permutation> &first,
-                                     permutation_iterator <BidirIt, std_permutation> &last) {
+        static bool next_permutation(permutation_iterator<BidirIt, log_permutation> &first,
+                                     permutation_iterator <BidirIt, log_permutation> &last) {
             if (first == last) return false;
             auto i = last;
             if (first == --i) return false;
             while (true) {
-                permutation_iterator <BidirIt, std_permutation> i1, i2;
+                permutation_iterator <BidirIt, log_permutation> i1, i2;
 
                 i1 = i;
                 if (*--i < *i1) {

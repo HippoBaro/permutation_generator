@@ -22,6 +22,7 @@ namespace hippobaro {
             bool reverse;
 
             explicit container(size_t set_size) noexcept : directions(set_size), reverse(false) {
+                directions.reserve(set_size);
                 for (auto &&item : directions) {
                     item = direction::left;
                 }
