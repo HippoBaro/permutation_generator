@@ -29,8 +29,8 @@ namespace hippobaro {
 
     template<typename Algo, typename InnerType>
     static auto create_permutation_iterators(InnerType &set) noexcept {
-        return std::make_pair(permutation_iterator<decltype(set.begin()), Algo>(set.begin(), nullptr),
-                              permutation_iterator<decltype(set.end()), Algo>(set.end(), nullptr));
+        return std::make_pair(permutation_iterator<decltype(set.begin()), Algo>(set.begin(), Algo::make_permutation_container(set)),
+                              permutation_iterator<decltype(set.end()), Algo>(set.end(), Algo::make_permutation_container(set)));
     }
 
     template<typename Algo, typename BidirIt>

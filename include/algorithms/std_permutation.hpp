@@ -10,7 +10,7 @@
 namespace hippobaro {
     class std_permutation {
 
-        class container { };
+        struct container { };
 
     public:
         using container = container;
@@ -26,7 +26,6 @@ namespace hippobaro {
             if (first == last) return false;
             auto i = last;
             if (first == --i) return false;
-
             while (true) {
                 permutation_iterator <BidirIt, std_permutation> i1, i2;
 
@@ -46,7 +45,5 @@ namespace hippobaro {
         }
     };
 }
-
-
 
 #endif //PERMUTATION_GENERATOR_STD_PERMUTATION_HPP
