@@ -7,7 +7,7 @@
 ### Dependency
 
 - `CMake 3.8` and newer
-- `Boost 1.64` and newer
+- `Boost 1.64` and newer (only `program_options`)
 
 ### Compilation
 
@@ -41,4 +41,15 @@ The code uses some C++17 features. It has been compiled successfully on:
 
 ## Performances
 
-The code is tuned for performance with the exclusive use of fixed-sized arrays. The algorithm are implemented in STL style, allowing the compiler to specialize all operations for every data type.
+The code is tuned for performance with the exclusive use of fixed-sized vectors. The algorithms are implemented in STL style, allowing the compiler to specialize all operations for every data type.
+
+## Bonus
+
+### STL style
+
+The implementation is heavily specialized and works for all container implementing `RandomAccessIterators`, i.e `std::array`, `std::string`, `std::vector`, etc. The permutations can be generated based on any data type implementing `operator<`.
+The example's `main()` function uses `std::vector<size_t>` as a demonstration, but could use `std::string` with no further changes.
+
+### Stateful and stateless API equivalent
+
+The API allows other algorithm to be added very easily in their own file, regardless of whether their are stateful (as Steinhaus–Johnson–Trotter) or stateless (as Lexicographic Order Generation). Independently, the API remains the same, and memory allocation is performed iff necessary.
