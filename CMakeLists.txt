@@ -9,7 +9,7 @@ add_executable(permutation_generator ${SOURCE_FILES})
 find_package(Boost 1.64 COMPONENTS program_options REQUIRED)
 target_include_directories(permutation_generator PUBLIC include ${Boost_INCLUDE_DIR})
 
-set(OPTS -O3 -Werror -Wall -Wextra)
+set(OPTS -Werror -Wall -Wextra -march=native -Ofast)
 target_compile_options(permutation_generator PUBLIC ${OPTS})
 
 TARGET_LINK_LIBRARIES(permutation_generator LINK_PUBLIC ${Boost_LIBRARIES})

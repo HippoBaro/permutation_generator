@@ -13,28 +13,28 @@ size_t factorial(size_t n)
     return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 
-template<typename Algo, typename Container>
-void make_all_permutation(Container& container) {
-    std::sort(container.begin(), container.end());
-    auto its = hippobaro::create_permutation_iterators<Algo>(container);
+template<typename Algo, typename RandomIterator>
+void make_all_permutation(RandomIterator begin, RandomIterator end) {
+    std::sort(begin, end);
+    auto its = hippobaro::create_permutation_iterators<Algo>(begin, end);
 
     size_t len = 0;
     do {
         ++len;
         if (print) {
-            for (auto &&number : container) {
-                std::cout << number << " ";
+            for (auto i = begin; i != end; ++i) {
+                std::cout << *i << " ";
             }
             std::cout << std::endl;
         }
-    } while(hippobaro::next_permutation(its.first, its.second));
-    std::cout << "Number of permutations: " << container.size() << "! = " << len << std::endl;
+    } while(hippobaro::next_permutation(its.begin, its.end));
+    std::cout << "Number of permutations: " << std::distance(begin, end) << "! = " << len << std::endl;
 }
 
 auto generate_vector(size_t len) {
-    std::vector<size_t> s(len);
+    int *s = new int[len]; //todo unique ptr
     for (size_t j = 0; j < len; ++j) {
-        s[j] = j;
+        s[j] = (char)j;
     }
     return s;
 }
@@ -57,7 +57,7 @@ int main(int ac, char **av) {
         return 1;
     }
 
-    std::vector<size_t> s;
+    int *s;
     if (vm.count("elements")) {
         s = generate_vector(vm["elements"].as<size_t>());
     } else {
@@ -68,11 +68,13 @@ int main(int ac, char **av) {
     auto algo = vm["algorithm"].as<std::string>();
     if (algo == "log") {
         std::cout << "Algorithm: Lexicographic Order Generation" << std::endl;
-        make_all_permutation<hippobaro::log_permutation>(s);
+        make_all_permutation<hippobaro::log_permutation>(s, s + vm["elements"].as<size_t>());
     } else if (algo == "sjt") {
         std::cout << "Algorithm: Steinhaus–Johnson–Trotter" << std::endl;
-        make_all_permutation<hippobaro::sjt_permutation>(s);
+        make_all_permutation<hippobaro::sjt_permutation>(s, s + vm["elements"].as<size_t>());
     } else
         std::cerr << "Unknown algorithm. See -help." << std::endl;
+
+
     return EXIT_SUCCESS;
 }

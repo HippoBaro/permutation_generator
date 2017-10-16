@@ -17,62 +17,34 @@ namespace hippobaro {
             right = 1
         };
 
-        struct container {
-            std::vector<direction> directions;
-            bool reverse;
-
-            explicit container(size_t set_size) noexcept : directions(set_size), reverse(false) {
-                directions.reserve(set_size);
-                for (auto &&item : directions) {
-                    item = direction::left;
-                }
-            }
-        };
-
     public:
-        using container = container;
+        typedef stateful_algorithm          statefulness;
+        typedef std::vector<direction>      container_type;
+        typedef container_type::iterator    container_iterator;
 
-        template<typename InnerType>
-        static std::shared_ptr<container> make_permutation_container(InnerType &set) noexcept {
-            return std::make_shared<container>(set.size());
+        template<typename RandomIterator>
+        static std::unique_ptr<container_type> make_permutation_container(RandomIterator const& begin, RandomIterator const& end) noexcept {
+            auto count = std::distance(begin, end);
+            auto cnt = std::make_unique<container_type>(count);
+            for (auto &&item : *cnt) {
+                item = direction::left;
+            }
+            return cnt;
         }
 
-        template<typename BidirIt>
-        static bool next_permutation(permutation_iterator<BidirIt, sjt_permutation> &first,
-                                     permutation_iterator <BidirIt, sjt_permutation> &last) {
+        template<typename RandomIterator>
+        static bool next_permutation(permutation_iterator<RandomIterator, sjt_permutation, container_iterator> const &first,
+                                     permutation_iterator <RandomIterator, sjt_permutation, container_iterator> const &last) {
 
-            auto container = first.container.get();
-            auto direction_for = [&] (BidirIt &item) {
-                if (container->reverse) {
-                    switch (container->directions[std::distance((BidirIt)first, item)]){
-                        case direction::left:
-                            return direction::right;
-                        case direction::right:
-                            return direction::left;
-                    }
-                }
-                auto distance = std::distance((BidirIt)first, item);
-                return container->directions[distance];
-            };
-
-            auto adjacent = [&] (BidirIt &item) {
-                return item + (int)direction_for(item);
-            };
-
-            auto swap = [&] (BidirIt one, BidirIt two) {
-                std::iter_swap(container->directions.begin() + std::distance((BidirIt)first, one),
-                               container->directions.begin() + std::distance((BidirIt)first, two));
-                std::iter_swap(one, two);
-            };
-
-            auto largest_mobile = [&] (BidirIt iterator) -> std::experimental::optional<BidirIt> {
-                std::experimental::optional<BidirIt> ret = {};
-                for (;iterator != (BidirIt)last; ++iterator) {
-                    auto dir = direction_for(iterator);
+            auto largest_mobile = [&] (auto iterator) {
+                std::experimental::optional<decltype(iterator)> ret = {};
+                for (;iterator != last; ++iterator) {
+                    auto dir = *iterator.container_item;
+                    auto adj = iterator + (int)*iterator.container_item;
                     if ((dir == direction::left && iterator == first)
-                        || (dir == direction::right && adjacent(iterator) == last))
+                        || (dir == direction::right && adj == last))
                         continue;
-                    if (*iterator > *adjacent(iterator))
+                    if (*iterator > *adj)
                         if (!ret || *iterator > **ret)
                             ret = iterator;
                 }
@@ -80,21 +52,22 @@ namespace hippobaro {
             };
 
             if (auto lmob = largest_mobile(first)) {
-                auto adj = adjacent(*lmob);
-                swap(*lmob, adj);
+                auto adj = *lmob + (int)*(*lmob).container_item;
 
-                for(auto i = first; i != (BidirIt)last; ++i) {
+                std::iter_swap(lmob->container_item, adj.container_item);
+                std::iter_swap(*lmob, adj);
+
+                for(auto i = first; i != last; ++i) {
                     if (i == adj)
                         continue;
                     auto i1 = *i;
                     if (i1 > *adj) {
-                        auto index = std::distance(first, i);
-                        switch (container->directions[index]) {
+                        switch (*i.container_item) {
                             case direction::left:
-                                container->directions[index] = direction::right;
+                                *i.container_item = direction::right;
                                 break;
                             case direction::right:
-                                container->directions[index] = direction::left;
+                                *i.container_item = direction::left;
                                 break;
                         }
                     }

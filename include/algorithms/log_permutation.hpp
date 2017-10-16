@@ -10,31 +10,23 @@
 namespace hippobaro {
     class log_permutation {
 
-        struct container { };
-
     public:
-        using container = container;
+        typedef stateless_algorithm         statefulness;
+        typedef char                        container_type;
+        typedef char                        container_iterator;
 
-        template<typename InnerType>
-        static std::shared_ptr<container> make_permutation_container(InnerType &) noexcept {
-            return nullptr;
-        }
-
-        template<typename BidirIt>
-        static bool next_permutation(permutation_iterator<BidirIt, log_permutation> &first,
-                                     permutation_iterator <BidirIt, log_permutation> &last) {
-            if (first == last) return false;
+        template<typename RandomIterator>
+        constexpr static bool next_permutation(RandomIterator const &first, RandomIterator const &last) {
             auto i = last;
-            if (first == --i) return false;
+            if (first == last || first == --i)
+                return false;
             while (true) {
-                permutation_iterator <BidirIt, log_permutation> i1, i2;
-
-                i1 = i;
-                if (*--i < *i1) {
-                    i2 = last;
-                    while (!(*i < *--i2));
-                    std::iter_swap(i, i2);
-                    std::reverse(i1, last);
+                auto ip1 = i;
+                if (*--i < *ip1) {
+                    auto j = last;
+                    while (!(*i < *--j));
+                    std::iter_swap(i, j);
+                    std::reverse(ip1, last);
                     return true;
                 }
                 if (i == first) {

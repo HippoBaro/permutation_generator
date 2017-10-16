@@ -52,4 +52,4 @@ The example's `main()` function uses `std::vector<size_t>` as a demonstration, b
 
 ### Stateful and stateless API equivalent
 
-The API allows other algorithm to be added very easily in their own file, regardless of whether their are stateful (as Steinhaus–Johnson–Trotter) or stateless (as Lexicographic Order Generation). Independently, the API remains the same, and memory allocation is performed iff necessary.
+The API allows other algorithms to be added very easily in their own files, regardless of whether their are stateful (as Steinhaus–Johnson–Trotter) or stateless (as Lexicographic Order Generation). Independently, the API remains the same, and memory allocation is performed iff necessary.

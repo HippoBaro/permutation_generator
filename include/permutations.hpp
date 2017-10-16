@@ -5,38 +5,126 @@
 #ifndef PERMUTATION_GENERATOR_PERMUTATION_HPP
 #define PERMUTATION_GENERATOR_PERMUTATION_HPP
 
+#include <iterator>
 #include <algorithm>
 #include <experimental/any>
 #include <experimental/type_traits>
 
 namespace hippobaro {
 
-    template<typename InnerIt, typename Algo>
-    class permutation_iterator : public InnerIt {
+    struct stateful_algorithm {};
+    struct stateless_algorithm {};
+
+    template<typename InnerType, typename Algo, typename ContainerIterator = char>
+    class permutation_iterator {
+
+    private:
+        InnerType _it;
 
     public:
-        using InnerIt::InnerIt;
 
-        std::shared_ptr<typename Algo::container> container;
+        typedef InnerType                                                       iterator_type;
+        typedef typename std::iterator_traits<iterator_type>::iterator_category iterator_category;
+        typedef typename std::iterator_traits<iterator_type>::value_type        value_type;
+        typedef typename std::iterator_traits<iterator_type>::difference_type   difference_type;
+        typedef typename std::iterator_traits<iterator_type>::pointer           pointer;
+        typedef typename std::iterator_traits<iterator_type>::reference         reference;
 
-        explicit permutation_iterator(InnerIt iterator,
-                             std::shared_ptr<typename Algo::container> container = nullptr) noexcept :
-                InnerIt(iterator), container(container) {}
+        ContainerIterator container_item;
 
-        explicit operator InnerIt() const { return *this; }
+        explicit permutation_iterator(InnerType iterator, typename Algo::container_iterator container_item) noexcept :
+                _it(iterator), container_item(container_item) {}
 
+        explicit permutation_iterator(InnerType iterator) noexcept :
+                _it(iterator), container_item() {}
+
+        operator iterator_type() const { return _it; }
+
+        bool operator==( permutation_iterator const& rhs) const {
+            return _it == rhs._it;
+        }
+
+        bool operator!=(permutation_iterator const& rhs) const {
+            return !(rhs == *this);
+        }
+
+        bool operator<(permutation_iterator const& rhs) const {
+            return _it < rhs._it;
+        }
+
+        bool operator>(permutation_iterator const& rhs) const {
+            return rhs < *this;
+        }
+
+        bool operator<=(permutation_iterator const& rhs) const {
+            return !(rhs < *this);
+        }
+
+        bool operator>=(permutation_iterator const& rhs) const {
+            return !(*this < rhs);
+        }
+
+        permutation_iterator &operator--() {
+            --container_item;
+            --_it;
+            return *this;
+        }
+
+        permutation_iterator &operator++() {
+            ++container_item;
+            ++_it;
+            return *this;
+        }
+
+        permutation_iterator operator-(int rhs) const {
+            return permutation_iterator(_it - rhs, container_item - rhs);
+        }
+
+        permutation_iterator operator+(int rhs) const {
+            return permutation_iterator(_it + rhs, container_item + rhs);
+        }
+
+        reference operator*() const {
+            return *_it;
+        }
     };
 
-    template<typename Algo, typename InnerType>
-    static auto create_permutation_iterators(InnerType &set) noexcept {
-        auto container = Algo::make_permutation_container(set);
-        return std::make_pair(permutation_iterator<decltype(set.begin()), Algo>(set.begin(), container),
-                              permutation_iterator<decltype(set.end()), Algo>(set.end(), container));
+    template<typename InnerType, typename Algo, typename ContainerIterator = char>
+    struct permutation_iterator_container {
+        permutation_iterator<InnerType, Algo, ContainerIterator> begin;
+        permutation_iterator<InnerType, Algo, ContainerIterator> end;
+    };
+
+    template<typename InnerType, typename Algo, typename ContainerIterator>
+    struct permutation_stateful_iterator_container : public permutation_iterator_container<InnerType, Algo, ContainerIterator> {
+        std::unique_ptr<typename Algo::container_type> container;
+    };
+
+    template<typename Algo, typename RandomIterator>
+    static auto create_permutation_iterators(RandomIterator const& begin, RandomIterator const& end) noexcept {
+        if constexpr (std::is_same<typename Algo::statefulness, stateful_algorithm>::value) {
+            auto state_container = Algo::make_permutation_container(begin, end);
+            permutation_stateful_iterator_container<RandomIterator, Algo, typename Algo::container_iterator> cnt { { permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(begin, state_container->begin()),
+                                                                                                                   permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(end, state_container->end()) },
+                                                                                                                   std::move(state_container) };
+            return cnt;
+        }
+        else {
+            permutation_iterator_container<RandomIterator, Algo> cnt {permutation_iterator<RandomIterator, Algo>(begin), permutation_iterator<RandomIterator, Algo>(end)};
+            return cnt;
+        }
     }
 
-    template<typename Algo, typename BidirIt>
-    bool next_permutation(permutation_iterator<BidirIt, Algo> &first, permutation_iterator<BidirIt, Algo> &last) {
-        return Algo::next_permutation(first, last);
+    template<typename Algo, typename RandomIterator>
+    constexpr bool next_permutation(permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator> const &first,
+                                    permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator> const &last) {
+        if constexpr (std::is_pointer<RandomIterator>::value) {
+            return Algo::template next_permutation<RandomIterator>(first, last);
+        }
+        else {
+            return Algo::next_permutation(first, last);
+        }
+
     }
 }
 
