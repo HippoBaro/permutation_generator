@@ -1,21 +1,13 @@
 #include <iostream>
 #include <vector>
-#include <algorithms/sjt_permutation.hpp>
-#include <cassert>
-#include <list>
 #include <boost/program_options.hpp>
+#include "algorithms/sjt_permutation.hpp"
 #include "algorithms/log_permutation.hpp"
 
 bool print = false;
 
-size_t factorial(size_t n)
-{
-    return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
-}
-
 template<typename Algo, typename RandomIterator>
 void make_all_permutation(RandomIterator begin, RandomIterator end) {
-    std::sort(begin, end);
     auto its = hippobaro::create_permutation_iterators<Algo>(begin, end);
 
     size_t len = 0;
