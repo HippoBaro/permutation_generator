@@ -8,10 +8,10 @@ The *Lexicographic Order Generation* algorithm is the fastest algorithm to find 
 It is currently the *de facto* implementation in many languages. `std::next_permutation` is implemented using this algorithm.
 
 ### Step-by-step
-1. Find largest index i such that array[i − 1] < array[i]. (If no such i exists, then this is already the last permutation.)
-2. Find largest index j such that j ≥ i and array[j] > array[i − 1].
-3. Swap array[j] and array[i − 1].
-4. Reverse the suffix starting at array[i].
+1. Find largest index `i` such that `array[i − 1] < array[i]`. (If no such i exists, then this is already the last permutation.)
+2. Find largest index `j` such that `j ≥ i` and `array[j] > array[i − 1]`.
+3. Swap `array[j]` and `array[i − 1]`.
+4. Reverse the suffix starting at `array[i]`.
 ### Performance
 At most $N/2$ swaps, where $N$ is the number of elements in the set to permute.
 
@@ -20,10 +20,9 @@ The *Steinhaus–Johnson–Trotter* is a formalisation of a very old permutation
 The following implementation uses Shimon Even's modification, adding a *direction* to each elements.
 
 ### Step-by-step
-1. Sort the set in lexicographical order and associate LEFT as the direction for each of the elements
+1. Sort the set in lexicographical order and associate `LEFT` as the direction for each of the elements
 2. Find the largest mobile integer and swap it with the adjacent element on its direction without changing the direction of any of these two.
-3. In doing so, if the largest mobile integer has reached a spot where it’s no more mobile, proceed with the next largest integer if it’s mobile.
-4. After each swapping, check if there’s any number, larger than the current largest mobile integer. If there’s one or more, change the direction of all of them.
+4. Check if there’s any number, larger than the current largest mobile integer. If there’s one or more, change the direction of all of them.
 
 ### Performance
 At most $N!$ swaps, where $N$ is the number of elements in the set to permute.
