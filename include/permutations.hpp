@@ -103,14 +103,18 @@ namespace hippobaro {
     template<typename Algo, typename RandomIterator>
     static auto create_permutation_iterators(RandomIterator const& begin, RandomIterator const& end) noexcept {
         if constexpr (std::is_same<typename Algo::statefulness, stateful_algorithm>::value) {
-            auto state_container = Algo::make_permutation_container(begin, end);
-            permutation_stateful_iterator_container<RandomIterator, Algo, typename Algo::container_iterator> cnt { { permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(begin, state_container->begin()),
-                                                                                                                   permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(end, state_container->end()) },
-                                                                                                                   std::move(state_container) };
-            return cnt;
+                auto state_container = Algo::make_permutation_container(begin, end);
+                permutation_stateful_iterator_container<RandomIterator, Algo, typename Algo::container_iterator> cnt {
+                    {
+                        permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(begin, state_container->begin()),
+                                permutation_iterator<RandomIterator, Algo, typename Algo::container_iterator>(end, state_container->end())
+                    }, std::move(state_container)
+                };
+                return cnt;
         }
         else {
-            permutation_iterator_container<RandomIterator, Algo> cnt {permutation_iterator<RandomIterator, Algo>(begin), permutation_iterator<RandomIterator, Algo>(end)};
+            permutation_iterator_container<RandomIterator, Algo> cnt{permutation_iterator<RandomIterator, Algo>(begin),
+                                                                     permutation_iterator<RandomIterator, Algo>(end)};
             return cnt;
         }
     }

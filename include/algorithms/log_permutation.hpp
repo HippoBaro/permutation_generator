@@ -16,7 +16,7 @@ namespace hippobaro {
         typedef char                        container_iterator;
 
         template<typename RandomIterator>
-        constexpr static bool next_permutation(RandomIterator const &first, RandomIterator const &last) {
+        constexpr static inline bool next_permutation(RandomIterator const &first, RandomIterator const &last) {
             auto i = last;
             if (first == last || first == --i)
                 return false;

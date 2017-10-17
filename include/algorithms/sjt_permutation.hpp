@@ -33,14 +33,13 @@ namespace hippobaro {
         }
 
         template<typename RandomIterator>
-        static bool next_permutation(permutation_iterator<RandomIterator, sjt_permutation, container_iterator> const &first,
+        static bool inline next_permutation(permutation_iterator<RandomIterator, sjt_permutation, container_iterator> const &first,
                                      permutation_iterator <RandomIterator, sjt_permutation, container_iterator> const &last) {
-
             auto largest_mobile = [&] (auto iterator) {
                 std::experimental::optional<decltype(iterator)> ret = {};
                 for (;iterator != last; ++iterator) {
                     auto dir = *iterator.container_item;
-                    auto adj = iterator + (int)*iterator.container_item;
+                    auto adj = iterator + (int)dir;
                     if ((dir == direction::left && iterator == first)
                         || (dir == direction::right && adj == last))
                         continue;

@@ -32,7 +32,7 @@ void make_all_permutation(RandomIterator begin, RandomIterator end) {
 }
 
 auto generate_vector(size_t len) {
-    int *s = new int[len]; //todo unique ptr
+    std::vector<int> s(len);
     for (size_t j = 0; j < len; ++j) {
         s[j] = (char)j;
     }
@@ -57,24 +57,21 @@ int main(int ac, char **av) {
         return 1;
     }
 
-    int *s;
-    if (vm.count("elements")) {
-        s = generate_vector(vm["elements"].as<size_t>());
-    } else {
+    if (!vm.count("elements")) {
         std::cerr << "Number of elements was not set. See --help." << std::endl;
         return EXIT_FAILURE;
     }
 
+    auto container = generate_vector(vm["elements"].as<size_t>());
     auto algo = vm["algorithm"].as<std::string>();
     if (algo == "log") {
         std::cout << "Algorithm: Lexicographic Order Generation" << std::endl;
-        make_all_permutation<hippobaro::log_permutation>(s, s + vm["elements"].as<size_t>());
+        make_all_permutation<hippobaro::log_permutation>(std::begin(container), std::end(container));
     } else if (algo == "sjt") {
         std::cout << "Algorithm: Steinhaus–Johnson–Trotter" << std::endl;
-        make_all_permutation<hippobaro::sjt_permutation>(s, s + vm["elements"].as<size_t>());
+        make_all_permutation<hippobaro::sjt_permutation>(std::begin(container), std::end(container));
     } else
         std::cerr << "Unknown algorithm. See -help." << std::endl;
-
 
     return EXIT_SUCCESS;
 }
